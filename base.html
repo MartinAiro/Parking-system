@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Parking System{% endblock %} | {{ facility_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  {% if current_role %}
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('main.dashboard') }}">🅿️ ParkFlow <small class="facility-tag">— {{ facility_name }}</small></a>
+    <nav>
+      <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('main.entry') }}">Check in</a>
+      <a href="{{ url_for('main.sessions') }}">Sessions</a>
+      {% if current_role == 'admin' %}
+      <a href="{{ url_for('main.reports') }}">Reports</a>
+      <a href="{{ url_for('main.slots') }}">Slots</a>
+      <a href="{{ url_for('main.rates') }}">Rates</a>
+      <a href="{{ url_for('main.staff') }}">Staff</a>
+      <a href="{{ url_for('main.audit_log') }}">Audit</a>
+      {% endif %}
+    </nav>
+    <div class="user-box">
+      <a href="{{ url_for('main.change_password') }}">{{ current_name }} <small>({{ current_role }})</small></a>
+      <a class="logout" href="{{ url_for('main.logout') }}">Log out</a>
+    </div>
+  </header>
+  {% endif %}
+  {% if test_data_mode %}<div class="banner banner-info">TEST DATA — all vehicles and sessions shown are synthetic. Nothing here is a Maasai Mall record.</div>{% endif %}
+  {% if weak_password %}<div class="banner banner-warn">You are using a demo password. <a href="{{ url_for('main.change_password') }}">Change it now.</a></div>{% endif %}
+  <main class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flash-stack">{% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

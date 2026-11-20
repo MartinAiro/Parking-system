@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<div class="stat-grid">
+  <div class="stat-card"><span class="stat-value">{{ occ.free }}</span><span class="stat-label">Free slots</span></div>
+  <div class="stat-card stat-warn"><span class="stat-value">{{ occ.occupied }}</span><span class="stat-label">Occupied (recorded)</span></div>
+  <div class="stat-card"><span class="stat-value">{{ occ.usable }}</span><span class="stat-label">Usable slots{% if occ.blocked %} ({{ occ.blocked }} blocked){% endif %}</span></div>
+  <div class="stat-card stat-good"><span class="stat-value">{{ "%.2f"|format(fees_today) }}</span><span class="stat-label">Fees calculated today</span></div>
+</div>
+<div class="panel">
+  <div class="panel-head"><h2>Vehicles currently parked</h2><a class="button" href="{{ url_for('main.entry') }}">+ Check in vehicle</a></div>
+  {% if active %}
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Plate</th><th>Type</th><th>Slot</th><th>Time in (EAT)</th><th></th></tr></thead>
+    <tbody>{% for s in active %}
+      <tr><td>{{ s.plate_number }}</td><td>{{ s.vehicle_type }}</td><td>{{ s.slot.code }}</td>
+          <td>{{ s.time_in.strftime("%Y-%m-%d %H:%M") }}</td>
+          <td class="actions"><a class="button button-small" href="{{ url_for('main.exit_vehicle', sid=s.id) }}">Check out</a>
+              <a class="button button-small button-secondary" href="{{ url_for('main.edit_plate', sid=s.id) }}">Fix plate</a></td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<p class="muted">No vehicles currently parked.</p>{% endif %}
+</div>
+{% endblock %}

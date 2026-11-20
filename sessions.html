@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Sessions{% endblock %}
+{% block content %}
+<h1>Sessions</h1>
+<form class="filters" method="get">
+  <input type="text" name="q" value="{{ plate }}" placeholder="Plate contains…">
+  <select name="status">{% for v in ('all','active','closed','voided') %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ v|capitalize }}</option>{% endfor %}</select>
+  {% if current_role == 'admin' %}<input type="date" name="date" value="{{ day }}">{% else %}<span class="muted small">Showing today only</span>{% endif %}
+  <button class="button button-small" type="submit">Filter</button>
+  {% if current_role == 'admin' %}<a class="button button-small button-secondary" href="{{ url_for('main.export_csv', status=status, q=plate, date=day) }}">Export CSV</a>{% endif %}
+</form>
+<div class="panel">
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>#</th><th>Plate</th><th>Type</th><th>Slot</th><th>In</th><th>Out</th><th>Calc. fee</th><th>Status</th>{% if current_role == 'admin' %}<th>Void</th>{% endif %}</tr></thead>
+    <tbody>{% for s in pager.items %}
+      <tr><td>{{ s.id }}</td><td>{{ s.plate_number }}</td><td>{{ s.vehicle_type }}</td><td>{{ s.slot.code }}</td>
+        <td>{{ s.time_in.strftime("%m-%d %H:%M") }}</td><td>{{ s.time_out.strftime("%m-%d %H:%M") if s.time_out else "—" }}</td>
+        <td>{{ "%.2f"|format(s.fee) if s.fee is not none else "—" }}</td>
+        <td><span class="badge badge-{{ s.status }}">{{ s.status }}</span>{% if s.void_reason %}<br><small class="muted">{{ s.void_reason }}</small>{% endif %}</td>
+        {% if current_role == 'admin' %}<td>{% if s.status != 'voided' %}
+          <form class="inline-form" method="post" action="{{ url_for('main.void_session', sid=s.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="text" name="reason" placeholder="Reason" maxlength="200" required>
+            <button class="button button-small button-danger" type="submit">Void</button></form>{% endif %}</td>{% endif %}
+      </tr>{% else %}<tr><td colspan="9" class="muted">No sessions match.</td></tr>{% endfor %}
+    </tbody></table></div>
+  <div class="pager">
+    {% if pager.has_prev %}<a href="{{ url_for('main.sessions', page=pager.prev_num, status=status, q=plate, date=day) }}">← Newer</a>{% endif %}
+    <span class="muted">Page {{ pager.page }} of {{ pager.pages or 1 }} · {{ pager.total }} sessions</span>
+    {% if pager.has_next %}<a href="{{ url_for('main.sessions', page=pager.next_num, status=status, q=plate, date=day) }}">Older →</a>{% endif %}
+  </div>
+</div>
+{% endblock %}

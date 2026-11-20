@@ -1,0 +1,7 @@
+audit_event: 6
+meta: 1
+parking_session: 1597
+rate: 4
+slot: 20
+staff: 2
+turn_away: 19

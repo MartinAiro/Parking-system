@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<h1>Reports</h1>
+<p class="muted small">Figures are calculated fees from recorded sessions — not payments received. Voided sessions are excluded.</p>
+<div class="stat-grid">
+  <div class="stat-card stat-good"><span class="stat-value">{{ "%.2f"|format(r.total_fees) }}</span><span class="stat-label">Total fees calculated</span></div>
+  <div class="stat-card"><span class="stat-value">{{ r.completed }}</span><span class="stat-label">Completed sessions</span></div>
+  <div class="stat-card"><span class="stat-value">{{ "%.0f"|format(r.avg_stay) }} min</span><span class="stat-label">Average stay</span></div>
+  <div class="stat-card stat-warn"><span class="stat-value">{{ "%.0f"|format(r.occupancy.rate) }}%</span><span class="stat-label">Occupied now ({{ r.occupancy.occupied }}/{{ r.occupancy.usable }})</span></div>
+</div>
+<div class="panel"><h2>Facility-full events and voids</h2>
+  <p>Check-in was opened with no free slot <strong>{{ r.turn_aways }}</strong> time(s) <span class="muted small">(optional feature)</span>. <strong>{{ r.voided }}</strong> session(s) voided.</p></div>
+<div class="panel"><h2>Fees and sessions by vehicle type</h2>
+  {% if r.by_type %}<table class="data-table"><thead><tr><th>Vehicle type</th><th>Sessions</th><th>Fees calculated</th></tr></thead>
+  <tbody>{% for t, d in r.by_type.items() %}<tr><td>{{ t }}</td><td>{{ d.count }}</td><td>{{ "%.2f"|format(d.fees) }}</td></tr>{% endfor %}</tbody></table>
+  {% else %}<p class="muted">No completed sessions yet.</p>{% endif %}</div>
+<div class="panel"><h2>Fees calculated by day (latest 14 days with activity)</h2>
+  {% if r.by_day %}{% set mx = r.by_day.values() | max %}<div class="bar-chart">{% for day, v in r.by_day.items() %}
+    <div class="bar-col"><div class="bar" style="height: {{ (v / mx * 100) if mx else 0 }}%;" title="{{ '%.2f'|format(v) }}"></div><span class="bar-label">{{ day[5:] }}</span></div>{% endfor %}</div>
+  {% else %}<p class="muted">No completed sessions yet.</p>{% endif %}</div>
+<div class="panel"><h2>Arrivals by hour of day (peak hours)</h2>
+  {% set mh = r.by_hour.values() | max %}<div class="bar-chart bar-chart-24">{% for h, c in r.by_hour.items() %}
+    <div class="bar-col"><div class="bar bar-accent" style="height: {{ (c / mh * 100) if mh else 0 }}%;" title="{{ c }} arrivals"></div><span class="bar-label">{{ h }}</span></div>{% endfor %}</div></div>
+<div class="panel"><h2>Repeat vehicles</h2>
+  {% if r.repeat %}<table class="data-table"><thead><tr><th>Plate</th><th>Visits</th></tr></thead>
+  <tbody>{% for p, c in r.repeat %}<tr><td>{{ p }}</td><td>{{ c }}</td></tr>{% endfor %}</tbody></table>{% else %}<p class="muted">No repeat vehicles yet.</p>{% endif %}</div>
+<p><a class="button button-secondary" href="{{ url_for('main.export_csv') }}">Export all sessions (CSV)</a></p>
+{% endblock %}

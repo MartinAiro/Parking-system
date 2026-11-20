@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Rates{% endblock %}
+{% block content %}
+<h1>Pricing rates</h1>
+<div class="panel narrow"><h2>Add / update a rate</h2>
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="vehicle_type">Vehicle type</label><input type="text" id="vehicle_type" name="vehicle_type" maxlength="30" placeholder="e.g. Car" required>
+    <label for="price_per_hour">Price per hour (0 for a free area)</label><input type="number" step="0.01" min="0" max="100000" id="price_per_hour" name="price_per_hour" required>
+    <label for="grace_minutes">Free grace period (minutes)</label><input type="number" min="0" max="240" id="grace_minutes" name="grace_minutes" value="10" required>
+    <button type="submit" class="button">Save rate</button></form></div>
+<div class="panel"><h2>Current rates</h2>
+  <p class="muted small">Placeholders until Maasai Mall's management confirms its actual charging rules.</p>
+  <table class="data-table"><thead><tr><th>Vehicle type</th><th>Price / hour</th><th>Grace period</th></tr></thead>
+  <tbody>{% for r in rates %}<tr><td>{{ r.vehicle_type }}</td><td>{{ "%.2f"|format(r.price_per_hour) }}</td><td>{{ r.grace_minutes }} min</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

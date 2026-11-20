@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Staff{% endblock %}
+{% block content %}
+<h1>Staff accounts</h1>
+<div class="panel narrow"><h2>Add an account</h2>
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="name">Full name</label><input type="text" id="name" name="name" maxlength="100" required>
+    <label for="username">Username</label><input type="text" id="username" name="username" maxlength="30" required>
+    <label for="role">Role</label><select id="role" name="role"><option value="attendant">Attendant</option><option value="admin">Administrator</option></select>
+    <label for="password">Password (8+ characters)</label><input type="password" id="password" name="password" autocomplete="new-password" required>
+    <label for="confirm">Confirm password</label><input type="password" id="confirm" name="confirm" autocomplete="new-password" required>
+    <button type="submit" class="button">Create account</button></form></div>
+<div class="panel"><h2>Accounts</h2>
+  <div class="table-wrap"><table class="data-table"><thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody>{% for s in staff %}<tr><td>{{ s.username }}</td><td>{{ s.name }}</td><td>{{ s.role }}</td>
+    <td><span class="badge badge-{{ 'free' if s.active else 'voided' }}">{{ 'active' if s.active else 'deactivated' }}</span></td>
+    <td class="actions">
+      <form class="inline-form" method="post" action="{{ url_for('main.toggle_staff', sid=s.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="button button-small button-secondary" type="submit">{{ 'Deactivate' if s.active else 'Activate' }}</button></form>
+      <form class="inline-form" method="post" action="{{ url_for('main.reset_staff_password', sid=s.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="password" name="password" placeholder="New password" autocomplete="new-password" required><input type="password" name="confirm" placeholder="Confirm" autocomplete="new-password" required>
+        <button class="button button-small" type="submit">Reset</button></form></td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

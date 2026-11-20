@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Audit log{% endblock %}
+{% block content %}
+<h1>Audit log</h1><p class="muted small">The latest 200 events: who did what, and when (EAT).</p>
+<div class="panel"><div class="table-wrap"><table class="data-table"><thead><tr><th>When</th><th>User</th><th>Action</th><th>Detail</th></tr></thead>
+<tbody>{% for e in events %}<tr><td>{{ e.at.strftime("%Y-%m-%d %H:%M:%S") }}</td><td>{{ e.username or "—" }}</td><td>{{ e.action }}</td><td>{{ e.detail or "" }}</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

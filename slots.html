@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Slots{% endblock %}
+{% block content %}
+<h1>Parking slots</h1>
+<div class="panel narrow"><h2>Add a slot</h2>
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="code">Slot code</label><input type="text" id="code" name="code" maxlength="20" placeholder="e.g. C-01" required>
+    <label for="zone">Zone</label><input type="text" id="zone" name="zone" maxlength="30" value="Main">
+    <button type="submit" class="button">Add slot</button></form></div>
+<div class="panel"><h2>All slots</h2>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Code</th><th>Zone</th><th>Recorded status</th><th></th></tr></thead>
+    <tbody>{% for s in slots %}<tr><td>{{ s.code }}</td><td>{{ s.zone }}</td>
+      <td><span class="badge badge-{{ s.status }}">{{ s.status }}</span></td>
+      <td>{% if s.status != 'occupied' %}<form class="inline-form" method="post" action="{{ url_for('main.toggle_slot', sid=s.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="button button-small button-secondary" type="submit">{{ 'Unblock' if s.status == 'blocked' else 'Block' }}</button></form>{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div></div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Check out{% endblock %}
+{% block content %}
+<h1>Check out vehicle</h1>
+<div class="panel narrow">
+  <dl class="detail-list">
+    <dt>Plate number</dt><dd>{{ ps.plate_number }}</dd>
+    <dt>Vehicle type</dt><dd>{{ ps.vehicle_type }}</dd>
+    <dt>Slot</dt><dd>{{ ps.slot.code }}</dd>
+    <dt>Time in</dt><dd>{{ ps.time_in.strftime("%Y-%m-%d %H:%M") }}</dd>
+    <dt>Time now</dt><dd>{{ now.strftime("%Y-%m-%d %H:%M") }}</dd>
+    <dt>Calculated fee</dt><dd class="fee">{{ "%.2f"|format(fee_preview) }}</dd>
+  </dl>
+  <p class="muted small">This is the amount owed, calculated from duration and rate. The system does not process payment — collect it separately before releasing the vehicle.</p>
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="button button-wide">Confirm check-out</button></form>
+  <a class="back-link" href="{{ url_for('main.dashboard') }}">Cancel</a>
+</div>
+{% endblock %}

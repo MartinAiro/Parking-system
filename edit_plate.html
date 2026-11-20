@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Fix plate{% endblock %}
+{% block content %}
+<h1>Correct a plate number</h1>
+<div class="panel narrow">
+  <p class="muted">Slot {{ ps.slot.code }}, in at {{ ps.time_in.strftime("%H:%M") }}. Only vehicles still parked can be corrected; the change is recorded in the audit log.</p>
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="plate_number">Plate number</label>
+    <input type="text" id="plate_number" name="plate_number" maxlength="15" value="{{ ps.plate_number }}" required autofocus>
+    <button type="submit" class="button">Save correction</button></form>
+  <a class="back-link" href="{{ url_for('main.dashboard') }}">Cancel</a>
+</div>
+{% endblock %}

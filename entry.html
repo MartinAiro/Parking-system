@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Check in{% endblock %}
+{% block content %}
+<h1>Check in a vehicle</h1>
+<div class="panel narrow">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="plate_number">Plate number</label>
+    <input type="text" id="plate_number" name="plate_number" maxlength="15" placeholder="e.g. KXX 123A" value="{{ form.get('plate_number','') }}" required autofocus>
+    <label for="vehicle_type">Vehicle type</label>
+    <select id="vehicle_type" name="vehicle_type" required>
+      {% for r in rates %}<option value="{{ r.vehicle_type }}" {% if form.get('vehicle_type') == r.vehicle_type %}selected{% endif %}>{{ r.vehicle_type }} ({{ "%.0f"|format(r.price_per_hour) }}/hr)</option>{% endfor %}
+    </select>
+    <label for="slot_id">Assign slot <small class="muted">(nearest free slot listed first — choose any free slot to override)</small></label>
+    <select id="slot_id" name="slot_id" required>
+      {% for slot in free_slots %}<option value="{{ slot.id }}">{{ slot.code }} — {{ slot.zone }}</option>{% endfor %}
+    </select>
+    {% if not free_slots %}<p class="flash flash-error">No free slots available. Check-in is disabled until a vehicle checks out and a slot is released.</p>{% endif %}
+    <button type="submit" class="button" {% if not free_slots %}disabled{% endif %}>Check in</button>
+  </form>
+</div>
+{% endblock %}
